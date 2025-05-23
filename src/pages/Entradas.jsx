@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft, FaCheck, FaArrowUp } from 'react-icons/fa';
 
 function Entradas() {
   const navigate = useNavigate();
@@ -9,85 +10,76 @@ function Entradas() {
   const [historial, setHistorial] = useState([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  useEffect(() => {
-    fetch('http://localhost/api.php?endpoint=productos')
-      .then(res => res.json())
-      .then(data => setProductos(data));
-
-    fetch('http://localhost/api.php?endpoint=almacenes')
-      .then(res => res.json())
-      .then(data => setAlmacenes(data));
-
-    fetch('http://localhost/api.php?endpoint=entradas')
-      .then(res => res.json())
-      .then(data => setHistorial(data));
-  }, []);
+  const API = 'https://master.soporteumg.com/api.php';
+  const ENDPOINT_PRODUCTOS = `${API}?endpoint=productos`;
+  const ENDPOINT_ALMACENES = `${API}?endpoint=almacenes`;
+  const ENDPOINT_ENTRADAS = `${API}?endpoint=entradas`;
+  const ENDPOINT_INVENTARIO = `${API}?endpoint=inventario`;
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 200);
-    };
+    fetch(ENDPOINT_PRODUCTOS).then(res => res.json()).then(setProductos);
+    fetch(ENDPOINT_ALMACENES).then(res => res.json()).then(setAlmacenes);
+    fetch(ENDPOINT_ENTRADAS).then(res => res.json()).then(setHistorial);
+
+    const handleScroll = () => setShowScrollTop(window.scrollY > 200);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const productoSeleccionado = productos.find(p => p.nombre === entrada.producto);
-    const almacenSeleccionado = almacenes.find(a => a.nombre === entrada.almacen);
-    if (!productoSeleccionado || !almacenSeleccionado) return alert('Datos inválidos');
-
+    const producto = productos.find(p => p.nombre === entrada.producto);
+    const almacen = almacenes.find(a => a.nombre === entrada.almacen);
     const cantidad = parseInt(entrada.cantidad);
 
-    // Verificar si ya existe registro en inventario
-    const invRes = await fetch('http://localhost/api.php?endpoint=inventario');
+    if (!producto || !almacen) return alert('Producto o almacén inválido');
+    if (isNaN(cantidad) || cantidad <= 0) return alert('La cantidad debe ser mayor a cero');
+
+    const invRes = await fetch(ENDPOINT_INVENTARIO);
     const inventario = await invRes.json();
-    const existente = inventario.find(i => i.producto_id === productoSeleccionado.id && i.almacen_id === almacenSeleccionado.id);
+    const existente = inventario.find(i =>
+      i.producto_id === producto.id && i.almacen_id === almacen.id
+    );
 
     if (existente) {
-      // Actualizar stock
       const nuevoStock = parseInt(existente.stock) + cantidad;
-      await fetch(`http://localhost/api.php?endpoint=inventario&id=${existente.id}`, {
+      await fetch(`${ENDPOINT_INVENTARIO}&id=${existente.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stock: nuevoStock })
       });
     } else {
-      // Crear nuevo registro
-      await fetch('http://localhost/api.php?endpoint=inventario', {
+      await fetch(ENDPOINT_INVENTARIO, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          producto_id: productoSeleccionado.id,
-          almacen_id: almacenSeleccionado.id,
+          producto_id: producto.id,
+          almacen_id: almacen.id,
           stock: cantidad
         })
       });
     }
 
-    // Registrar entrada
-    await fetch('http://localhost/api.php?endpoint=entradas', {
+    await fetch(ENDPOINT_ENTRADAS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        producto_id: productoSeleccionado.id,
-        almacen_id: almacenSeleccionado.id,
-        cantidad: cantidad
+        producto_id: producto.id,
+        almacen_id: almacen.id,
+        cantidad
       })
     });
 
-    // Actualizar historial
-    fetch('http://localhost/api.php?endpoint=entradas')
-      .then(res => res.json())
-      .then(data => setHistorial(data));
-
+    fetch(ENDPOINT_ENTRADAS).then(res => res.json()).then(setHistorial);
     setEntrada({ producto: '', almacen: '', cantidad: '' });
-    alert('Entrada registrada exitosamente');
+    alert('Entrada registrada correctamente');
+    scrollToTop();
   };
+
+  const getNombreProducto = (id) => productos.find(p => p.id === id)?.nombre || '—';
+  const getNombreAlmacen = (id) => almacenes.find(a => a.id === id)?.nombre || '—';
 
   const goBackToDashboard = () => {
     const role = localStorage.getItem('userRole') || sessionStorage.getItem('userRole');
@@ -98,14 +90,27 @@ function Entradas() {
   };
 
   return (
-    <div className="dashboard-container">
+    <div
+      className="dashboard-container"
+      style={{
+        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+        minHeight: '100vh',
+        padding: '2rem 1rem',
+        color: '#fff',
+        margin: '0 auto',
+      }}
+    >
       <h1 className="dashboard-title">Registro de Entradas 📥</h1>
 
-      <button onClick={goBackToDashboard} className="back-button" style={{ alignSelf: 'flex-start' }}>
-        ←
+      <button
+        onClick={goBackToDashboard}
+        className="back-button"
+        style={{ alignSelf: 'flex-start', display: 'inline-block' }}
+      >
+        <FaArrowLeft />
       </button>
 
-      <form onSubmit={handleSubmit} className="form" style={{ flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'flex-start' }}>
+      <form onSubmit={handleSubmit} className="form">
         <select
           value={entrada.producto}
           onChange={(e) => setEntrada({ ...entrada, producto: e.target.value })}
@@ -136,13 +141,20 @@ function Entradas() {
           required
         />
 
-        <button type="submit" className="add-button">Registrar Entrada</button>
+        <button type="submit" className="add-button">
+          <FaCheck /> Registrar Entrada
+        </button>
       </form>
 
       {historial.length > 0 && (
-        <div style={{ width: '100%', maxWidth: '800px', marginTop: '2rem', textAlign: 'center' }}>
-          <h2>Historial de Entradas</h2>
-          <table className="table">
+        <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+          <h2 style={{ textAlign: 'center', color: '#fff', margin: '1rem 0' }}>
+            Historial de Entradas
+          </h2>
+          <table
+            className="table"
+            style={{ width: 'max-content', minWidth: '100%', tableLayout: 'auto' }}
+          >
             <thead>
               <tr>
                 <th>Producto</th>
@@ -152,12 +164,12 @@ function Entradas() {
               </tr>
             </thead>
             <tbody>
-              {historial.map((h, index) => (
-                <tr key={index}>
-                  <td>{h.producto}</td>
-                  <td>{h.almacen}</td>
-                  <td>{h.cantidad}</td>
-                  <td>{h.fecha}</td>
+              {historial.map((h, i) => (
+                <tr key={i}>
+                  <td data-label="Producto">{getNombreProducto(h.producto_id)}</td>
+                  <td data-label="Almacén">{getNombreAlmacen(h.almacen_id)}</td>
+                  <td data-label="Cantidad">{h.cantidad}</td>
+                  <td data-label="Fecha">{new Date(h.fecha).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -166,7 +178,9 @@ function Entradas() {
       )}
 
       {showScrollTop && (
-        <button onClick={scrollToTop} className="scroll-top-button">⬆️ Subir</button>
+        <button onClick={scrollToTop} className="scroll-top-button">
+          <FaArrowUp />
+        </button>
       )}
     </div>
   );
