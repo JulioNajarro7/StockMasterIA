@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { FaCheck, FaEdit, FaTrash, FaArrowUp, FaArrowLeft } from 'react-icons/fa';
 
 function Productos() {
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState('');
+=======
+
+function Productos() {
+  const [productos, setProductos] = useState([]);
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
   const [form, setForm] = useState({
     id: null,
     nombre: '',
@@ -15,17 +21,32 @@ function Productos() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const navigate = useNavigate();
   const moneda = 'Q';
+<<<<<<< HEAD
   const API_URL = 'https://master.soporteumg.com/api.php?endpoint=productos';
 
   useEffect(() => {
     fetchProductos();
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
+=======
+
+  useEffect(() => {
+    fetchProductos();
+
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const fetchProductos = async () => {
+<<<<<<< HEAD
     const res = await fetch(API_URL);
+=======
+    const res = await fetch('http://localhost/api.php?endpoint=productos');
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     const data = await res.json();
     setProductos(data);
   };
@@ -33,7 +54,13 @@ function Productos() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = form.id ? 'PUT' : 'POST';
+<<<<<<< HEAD
     const url = form.id ? `${API_URL}&id=${form.id}` : API_URL;
+=======
+    const url = form.id
+      ? `http://localhost/api.php?endpoint=productos&id=${form.id}`
+      : 'http://localhost/api.php?endpoint=productos';
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
     await fetch(url, {
       method,
@@ -47,12 +74,25 @@ function Productos() {
 
   const handleEdit = (producto) => {
     setForm({ ...producto });
+<<<<<<< HEAD
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
     await fetch(`${API_URL}&id=${id}`, { method: 'DELETE' });
+=======
+  };
+
+  const handleDelete = async (id) => {
+    const confirmacion = window.confirm('¿Estás seguro de eliminar este producto?');
+    if (!confirmacion) return;
+
+    await fetch(`http://localhost/api.php?endpoint=productos&id=${id}`, {
+      method: 'DELETE',
+    });
+
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     fetchProductos();
   };
 
@@ -68,6 +108,7 @@ function Productos() {
     else navigate('/');
   };
 
+<<<<<<< HEAD
   const productosFiltrados = productos.filter((prod) =>
     prod.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
     prod.categoria.toLowerCase().includes(filtro.toLowerCase())
@@ -92,6 +133,14 @@ function Productos() {
         style={{ alignSelf: 'flex-start', display: 'inline-block' }}
       >
         <FaArrowLeft />
+=======
+  return (
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Gestión de Productos 📦</h1>
+
+      <button onClick={goBackToDashboard} className="back-button" style={{ alignSelf: 'flex-start' }}>
+        ←
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       </button>
 
       <form onSubmit={handleSubmit} className="form">
@@ -139,6 +188,7 @@ function Productos() {
         />
 
         <button type="submit" className="add-button">
+<<<<<<< HEAD
           {form.id ? <><FaEdit /> Actualizar</> : <><FaCheck /> Guardar</>}
         </button>
       </form>
@@ -209,6 +259,47 @@ function Productos() {
       {showScrollTop && (
         <button onClick={scrollToTop} className="scroll-top-button">
           <FaArrowUp />
+=======
+          {form.id ? 'Actualizar' : 'Agregar'} Producto
+        </button>
+      </form>
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Stock</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productos.length === 0 ? (
+            <tr>
+              <td colSpan="5">No hay productos registrados.</td>
+            </tr>
+          ) : (
+            productos.map((prod) => (
+              <tr key={prod.id}>
+                <td>{prod.nombre}</td>
+                <td>{prod.categoria}</td>
+                <td>{prod.stock}</td>
+                <td>{moneda}{parseFloat(prod.precio).toFixed(2)}</td>
+                <td>
+                  <button className="btn-action btn-edit" onClick={() => handleEdit(prod)}>Editar</button>
+                  <button className="btn-action btn-delete" onClick={() => handleDelete(prod.id)}>Eliminar</button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      {showScrollTop && (
+        <button onClick={scrollToTop} className="scroll-top-button">
+          ⬆️ Subir
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         </button>
       )}
     </div>

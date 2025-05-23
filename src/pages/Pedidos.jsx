@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { FaCheck, FaEdit, FaTrash, FaArrowUp, FaArrowLeft } from 'react-icons/fa';
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
 function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [almacenes, setAlmacenes] = useState([]);
+<<<<<<< HEAD
   const [filtro, setFiltro] = useState('');
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
   const [form, setForm] = useState({
     id: null,
     cliente: '',
@@ -17,6 +23,7 @@ function Pedidos() {
   const navigate = useNavigate();
   const moneda = 'Q';
 
+<<<<<<< HEAD
   const API_PEDIDOS = 'https://master.soporteumg.com/api.php?endpoint=pedidos';
   const API_ALMACENES = 'https://master.soporteumg.com/api.php?endpoint=almacenes';
 
@@ -24,18 +31,36 @@ function Pedidos() {
     fetchPedidos();
     fetchAlmacenes();
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
+=======
+  useEffect(() => {
+    fetchPedidos();
+    fetchAlmacenes();
+
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const fetchPedidos = async () => {
+<<<<<<< HEAD
     const res = await fetch(API_PEDIDOS);
+=======
+    const res = await fetch('http://localhost/api.php?endpoint=pedidos');
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     const data = await res.json();
     setPedidos(data);
   };
 
   const fetchAlmacenes = async () => {
+<<<<<<< HEAD
     const res = await fetch(API_ALMACENES);
+=======
+    const res = await fetch('http://localhost/api.php?endpoint=almacenes');
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     const data = await res.json();
     setAlmacenes(data);
   };
@@ -43,7 +68,13 @@ function Pedidos() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = form.id ? 'PUT' : 'POST';
+<<<<<<< HEAD
     const url = form.id ? `${API_PEDIDOS}&id=${form.id}` : API_PEDIDOS;
+=======
+    const url = form.id
+      ? `http://localhost/api.php?endpoint=pedidos&id=${form.id}`
+      : 'http://localhost/api.php?endpoint=pedidos';
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
     await fetch(url, {
       method,
@@ -63,12 +94,25 @@ function Pedidos() {
       total: pedido.total,
       almacen_id: pedido.almacen_id
     });
+<<<<<<< HEAD
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este pedido?')) return;
     await fetch(`${API_PEDIDOS}&id=${id}`, { method: 'DELETE' });
+=======
+  };
+
+  const handleDelete = async (id) => {
+    const confirmacion = window.confirm('¿Estás seguro de eliminar este pedido?');
+    if (!confirmacion) return;
+
+    await fetch(`http://localhost/api.php?endpoint=pedidos&id=${id}`, {
+      method: 'DELETE',
+    });
+
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     fetchPedidos();
   };
 
@@ -84,6 +128,7 @@ function Pedidos() {
     else navigate('/');
   };
 
+<<<<<<< HEAD
   const pedidosFiltrados = pedidos.filter((p) =>
     p.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
     p.estado.toLowerCase().includes(filtro.toLowerCase())
@@ -111,6 +156,17 @@ function Pedidos() {
       </button>
 
       <form onSubmit={handleSubmit} className="form">
+=======
+  return (
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Gestión de Pedidos 📑</h1>
+
+      <button onClick={goBackToDashboard} className="back-button" style={{ alignSelf: 'flex-start' }}>
+        ←
+      </button>
+
+      <form onSubmit={handleSubmit} className="form" style={{ justifyContent: 'flex-start' }}>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         <input
           value={form.cliente}
           onChange={(e) => setForm({ ...form, cliente: e.target.value })}
@@ -159,6 +215,7 @@ function Pedidos() {
         </select>
 
         <button type="submit" className="add-button">
+<<<<<<< HEAD
           {form.id ? <><FaEdit /> Actualizar</> : <><FaCheck /> Guardar</>}
         </button>
       </form>
@@ -231,6 +288,47 @@ function Pedidos() {
       {showScrollTop && (
         <button onClick={scrollToTop} className="scroll-top-button">
           <FaArrowUp />
+=======
+          {form.id ? 'Actualizar' : 'Agregar'} Pedido
+        </button>
+      </form>
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Almacén</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pedidos.length === 0 ? (
+            <tr>
+              <td colSpan="5">No hay pedidos registrados.</td>
+            </tr>
+          ) : (
+            pedidos.map((p) => (
+              <tr key={p.id}>
+                <td>{p.cliente}</td>
+                <td>{p.estado}</td>
+                <td>{moneda}{parseFloat(p.total).toFixed(2)}</td>
+                <td>{p.almacen_nombre || '—'}</td>
+                <td>
+                  <button className="btn-action btn-edit" onClick={() => handleEdit(p)}>Editar</button>
+                  <button className="btn-action btn-delete" onClick={() => handleDelete(p.id)}>Eliminar</button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      {showScrollTop && (
+        <button onClick={scrollToTop} className="scroll-top-button">
+          ⬆️ Subir
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         </button>
       )}
     </div>
