@@ -17,11 +17,15 @@ import Reportes from './pages/Reportes.jsx';
 import Usuarios from './pages/Usuarios.jsx';
 import Error404 from './pages/Error404.jsx';
 
+<<<<<<< HEAD
 import AiComandos from './pages/AiComandos.jsx';
 import Graficas from './pages/Graficas.jsx';
 import RecuperarContraseña from './pages/RecuperarContraseña.jsx';
 import CrearUsuario from './pages/CrearUsuario.jsx';
 import ActivarUsuario from './pages/ActivarUsuario.jsx';
+=======
+import AiComandos from './pages/AiComandos.jsx'; // 👈 única IA que queda activa
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
 function App() {
   const navigate = useNavigate();
@@ -33,6 +37,7 @@ function App() {
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
+<<<<<<< HEAD
     const remember = localStorage.getItem('rememberMe') === 'true';
     const auth = localStorage.getItem('isAuthenticated') === 'true';
     const role = localStorage.getItem('userRole');
@@ -42,12 +47,22 @@ function App() {
       setUserRole(role);
     }
 
+=======
+    const localAuth = localStorage.getItem('isAuthenticated') === 'true';
+    const sessionAuth = sessionStorage.getItem('isAuthenticated') === 'true';
+    const role = localStorage.getItem('userRole') || sessionStorage.getItem('userRole');
+    if (localAuth || sessionAuth) {
+      setIsAuthenticated(true);
+      setUserRole(role);
+    }
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     setCheckingAuth(false);
   }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+<<<<<<< HEAD
       const response = await fetch('https://master.soporteumg.com/api.php?endpoint=usuarios');
       const users = await response.json();
 
@@ -79,12 +94,40 @@ function App() {
         if (userFound.rol === 'admin') navigate('/admin');
         else if (userFound.rol === 'tecnico') navigate('/tecnico');
         else if (userFound.rol === 'operativo') navigate('/operativo');
+=======
+      const response = await fetch('http://localhost/api.php?endpoint=login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: email, password })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setIsAuthenticated(true);
+        setUserRole(data.user.rol);
+
+        if (rememberMe) {
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('userRole', data.user.rol);
+        } else {
+          sessionStorage.setItem('isAuthenticated', 'true');
+          sessionStorage.setItem('userRole', data.user.rol);
+        }
+
+        // Redirección según el rol
+        if (data.user.rol === 'admin') navigate('/admin');
+        else if (data.user.rol === 'tecnico') navigate('/tecnico');
+        else if (data.user.rol === 'operativo') navigate('/operativo');
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         else navigate('/');
       } else {
         alert('Usuario o contraseña incorrectos');
       }
     } catch (error) {
+<<<<<<< HEAD
       console.error('Error al conectar con API:', error);
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       alert('Error de servidor');
     }
   };
@@ -98,10 +141,14 @@ function App() {
 
   const ProtectedRoute = ({ children }) => {
     if (checkingAuth) return <div className="loading">Cargando...</div>;
+<<<<<<< HEAD
     const localAuth = localStorage.getItem('isAuthenticated') === 'true';
     const sessionAuth = sessionStorage.getItem('isAuthenticated') === 'true';
 
     if (!localAuth && !sessionAuth) return <Navigate to="/" replace />;
+=======
+    if (!isAuthenticated) return <Navigate to="/" replace />;
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     return children;
   };
 
@@ -114,7 +161,10 @@ function App() {
             <div className="login-card">
               <img src={LogoMSX} alt="Logo MasterStockX" className="login-logo" />
               <h1 className="login-title">Usuario</h1>
+<<<<<<< HEAD
 
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
               <form onSubmit={handleLogin} className="login-form">
                 <input
                   type="text"
@@ -130,7 +180,10 @@ function App() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+<<<<<<< HEAD
 
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
                 <div className="remember-me">
                   <input
                     type="checkbox"
@@ -138,6 +191,7 @@ function App() {
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                   />
+<<<<<<< HEAD
                   <label htmlFor="rememberMe">Recordar esta sesión</label>
                 </div>
 
@@ -153,16 +207,29 @@ function App() {
                     ¿No tienes cuenta? Crear usuario
                   </a>
                 </p>
+=======
+                  <label htmlFor="rememberMe">Recordarme esta sesión</label>
+                </div>
+                <button type="submit">Iniciar sesión</button>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
               </form>
             </div>
           </div>
         }
       />
 
+<<<<<<< HEAD
+=======
+      {/* Dashboards */}
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       <Route path="/admin" element={<ProtectedRoute><AdminDashboard onLogout={handleLogout} /></ProtectedRoute>} />
       <Route path="/tecnico" element={<ProtectedRoute><TecnicoDashboard onLogout={handleLogout} /></ProtectedRoute>} />
       <Route path="/operativo" element={<ProtectedRoute><OperativoDashboard onLogout={handleLogout} /></ProtectedRoute>} />
 
+<<<<<<< HEAD
+=======
+      {/* Módulos funcionales */}
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       <Route path="/productos" element={<ProtectedRoute><Productos /></ProtectedRoute>} />
       <Route path="/almacenes" element={<ProtectedRoute><Almacenes /></ProtectedRoute>} />
       <Route path="/pedidos" element={<ProtectedRoute><Pedidos /></ProtectedRoute>} />
@@ -171,6 +238,7 @@ function App() {
       <Route path="/salidas" element={<ProtectedRoute><Salidas /></ProtectedRoute>} />
       <Route path="/reportes" element={<ProtectedRoute><Reportes /></ProtectedRoute>} />
       <Route path="/usuarios" element={<ProtectedRoute><Usuarios /></ProtectedRoute>} />
+<<<<<<< HEAD
       <Route path="/graficas" element={<ProtectedRoute><Graficas /></ProtectedRoute>} />
       <Route path="/ai-comandos" element={<ProtectedRoute><AiComandos /></ProtectedRoute>} />
 
@@ -178,6 +246,13 @@ function App() {
       <Route path="/crear" element={<CrearUsuario />} />
       <Route path="/activar" element={<ActivarUsuario />} />
 
+=======
+
+      {/* 👇 Módulo único de IA con comandos */}
+      <Route path="/ai-comandos" element={<ProtectedRoute><AiComandos /></ProtectedRoute>} />
+
+      {/* Error */}
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       <Route path="*" element={<Error404 />} />
     </Routes>
   );

@@ -13,6 +13,7 @@ function Error404() {
   };
 
   return (
+<<<<<<< HEAD
     <div className="error-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <div style={{ backgroundColor: 'rgba(255,255,255,0.95)', padding: '3rem', borderRadius: '1rem', textAlign: 'center', boxShadow: '0 0 15px rgba(0,0,0,0.1)' }}>
         <h1 className="error-title" style={{ fontSize: '5rem', marginBottom: '1rem', color: '#e53e3e' }}>404 🚫</h1>
@@ -26,6 +27,13 @@ function Error404() {
           border: 'none',
           cursor: 'pointer'
         }}>
+=======
+    <div className="error-container">
+      <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '2rem', borderRadius: '1rem' }}>
+        <h1 className="error-title">404 🚫</h1>
+        <p className="error-message">La página que buscas no existe.</p>
+        <button onClick={handleBack} className="back-button" style={{ marginTop: '1rem' }}>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
           Volver al Dashboard
         </button>
       </div>

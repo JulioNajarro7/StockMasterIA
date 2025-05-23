@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { FaArrowLeft, FaCheck, FaArrowUp } from 'react-icons/fa';
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
 function Entradas() {
   const navigate = useNavigate();
@@ -10,6 +13,7 @@ function Entradas() {
   const [historial, setHistorial] = useState([]);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+<<<<<<< HEAD
   const API = 'https://master.soporteumg.com/api.php';
   const ENDPOINT_PRODUCTOS = `${API}?endpoint=productos`;
   const ENDPOINT_ALMACENES = `${API}?endpoint=almacenes`;
@@ -22,10 +26,31 @@ function Entradas() {
     fetch(ENDPOINT_ENTRADAS).then(res => res.json()).then(setHistorial);
 
     const handleScroll = () => setShowScrollTop(window.scrollY > 200);
+=======
+  useEffect(() => {
+    fetch('http://localhost/api.php?endpoint=productos')
+      .then(res => res.json())
+      .then(data => setProductos(data));
+
+    fetch('http://localhost/api.php?endpoint=almacenes')
+      .then(res => res.json())
+      .then(data => setAlmacenes(data));
+
+    fetch('http://localhost/api.php?endpoint=entradas')
+      .then(res => res.json())
+      .then(data => setHistorial(data));
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 200);
+    };
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+<<<<<<< HEAD
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const handleSubmit = async (e) => {
@@ -46,22 +71,56 @@ function Entradas() {
     if (existente) {
       const nuevoStock = parseInt(existente.stock) + cantidad;
       await fetch(`${ENDPOINT_INVENTARIO}&id=${existente.id}`, {
+=======
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const productoSeleccionado = productos.find(p => p.nombre === entrada.producto);
+    const almacenSeleccionado = almacenes.find(a => a.nombre === entrada.almacen);
+    if (!productoSeleccionado || !almacenSeleccionado) return alert('Datos inválidos');
+
+    const cantidad = parseInt(entrada.cantidad);
+
+    // Verificar si ya existe registro en inventario
+    const invRes = await fetch('http://localhost/api.php?endpoint=inventario');
+    const inventario = await invRes.json();
+    const existente = inventario.find(i => i.producto_id === productoSeleccionado.id && i.almacen_id === almacenSeleccionado.id);
+
+    if (existente) {
+      // Actualizar stock
+      const nuevoStock = parseInt(existente.stock) + cantidad;
+      await fetch(`http://localhost/api.php?endpoint=inventario&id=${existente.id}`, {
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stock: nuevoStock })
       });
     } else {
+<<<<<<< HEAD
       await fetch(ENDPOINT_INVENTARIO, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           producto_id: producto.id,
           almacen_id: almacen.id,
+=======
+      // Crear nuevo registro
+      await fetch('http://localhost/api.php?endpoint=inventario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          producto_id: productoSeleccionado.id,
+          almacen_id: almacenSeleccionado.id,
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
           stock: cantidad
         })
       });
     }
 
+<<<<<<< HEAD
     await fetch(ENDPOINT_ENTRADAS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -80,6 +139,27 @@ function Entradas() {
 
   const getNombreProducto = (id) => productos.find(p => p.id === id)?.nombre || '—';
   const getNombreAlmacen = (id) => almacenes.find(a => a.id === id)?.nombre || '—';
+=======
+    // Registrar entrada
+    await fetch('http://localhost/api.php?endpoint=entradas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        producto_id: productoSeleccionado.id,
+        almacen_id: almacenSeleccionado.id,
+        cantidad: cantidad
+      })
+    });
+
+    // Actualizar historial
+    fetch('http://localhost/api.php?endpoint=entradas')
+      .then(res => res.json())
+      .then(data => setHistorial(data));
+
+    setEntrada({ producto: '', almacen: '', cantidad: '' });
+    alert('Entrada registrada exitosamente');
+  };
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
   const goBackToDashboard = () => {
     const role = localStorage.getItem('userRole') || sessionStorage.getItem('userRole');
@@ -90,6 +170,7 @@ function Entradas() {
   };
 
   return (
+<<<<<<< HEAD
     <div
       className="dashboard-container"
       style={{
@@ -111,6 +192,16 @@ function Entradas() {
       </button>
 
       <form onSubmit={handleSubmit} className="form">
+=======
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Registro de Entradas 📥</h1>
+
+      <button onClick={goBackToDashboard} className="back-button" style={{ alignSelf: 'flex-start' }}>
+        ←
+      </button>
+
+      <form onSubmit={handleSubmit} className="form" style={{ flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'flex-start' }}>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         <select
           value={entrada.producto}
           onChange={(e) => setEntrada({ ...entrada, producto: e.target.value })}
@@ -141,6 +232,7 @@ function Entradas() {
           required
         />
 
+<<<<<<< HEAD
         <button type="submit" className="add-button">
           <FaCheck /> Registrar Entrada
         </button>
@@ -155,6 +247,15 @@ function Entradas() {
             className="table"
             style={{ width: 'max-content', minWidth: '100%', tableLayout: 'auto' }}
           >
+=======
+        <button type="submit" className="add-button">Registrar Entrada</button>
+      </form>
+
+      {historial.length > 0 && (
+        <div style={{ width: '100%', maxWidth: '800px', marginTop: '2rem', textAlign: 'center' }}>
+          <h2>Historial de Entradas</h2>
+          <table className="table">
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
             <thead>
               <tr>
                 <th>Producto</th>
@@ -164,12 +265,21 @@ function Entradas() {
               </tr>
             </thead>
             <tbody>
+<<<<<<< HEAD
               {historial.map((h, i) => (
                 <tr key={i}>
                   <td data-label="Producto">{getNombreProducto(h.producto_id)}</td>
                   <td data-label="Almacén">{getNombreAlmacen(h.almacen_id)}</td>
                   <td data-label="Cantidad">{h.cantidad}</td>
                   <td data-label="Fecha">{new Date(h.fecha).toLocaleString()}</td>
+=======
+              {historial.map((h, index) => (
+                <tr key={index}>
+                  <td>{h.producto}</td>
+                  <td>{h.almacen}</td>
+                  <td>{h.cantidad}</td>
+                  <td>{h.fecha}</td>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
                 </tr>
               ))}
             </tbody>
@@ -178,9 +288,13 @@ function Entradas() {
       )}
 
       {showScrollTop && (
+<<<<<<< HEAD
         <button onClick={scrollToTop} className="scroll-top-button">
           <FaArrowUp />
         </button>
+=======
+        <button onClick={scrollToTop} className="scroll-top-button">⬆️ Subir</button>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       )}
     </div>
   );

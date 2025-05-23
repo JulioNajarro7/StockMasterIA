@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { FaCheck, FaEdit, FaTrash, FaArrowUp, FaArrowLeft } from 'react-icons/fa';
 
 function Usuarios() {
@@ -29,6 +30,27 @@ function Usuarios() {
 
   const fetchUsuarios = async () => {
     const res = await fetch(API_USUARIOS);
+=======
+
+function Usuarios() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [form, setForm] = useState({ id: null, nombre: '', password: '', rol: '' });
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchUsuarios();
+
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const fetchUsuarios = async () => {
+    const res = await fetch('http://localhost/api.php?endpoint=usuarios');
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     const data = await res.json();
     setUsuarios(data);
   };
@@ -36,7 +58,13 @@ function Usuarios() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = form.id ? 'PUT' : 'POST';
+<<<<<<< HEAD
     const url = form.id ? `${API_USUARIOS}&id=${form.id}` : API_USUARIOS;
+=======
+    const url = form.id
+      ? `http://localhost/api.php?endpoint=usuarios&id=${form.id}`
+      : 'http://localhost/api.php?endpoint=usuarios';
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
     await fetch(url, {
       method,
@@ -45,6 +73,7 @@ function Usuarios() {
     });
 
     fetchUsuarios();
+<<<<<<< HEAD
     setForm({ id: null, nombre: '', correo: '', password: '', rol: '', estado: 'activo' });
   };
 
@@ -64,6 +93,20 @@ function Usuarios() {
     if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return;
 
     await fetch(`${API_USUARIOS}&id=${id}`, {
+=======
+    setForm({ id: null, nombre: '', password: '', rol: '' });
+  };
+
+  const handleEdit = (usuario) => {
+    setForm({ id: usuario.id, nombre: usuario.nombre, password: usuario.password, rol: usuario.rol });
+  };
+
+  const handleDelete = async (id) => {
+    const confirmacion = window.confirm('¿Estás seguro de eliminar este usuario?');
+    if (!confirmacion) return;
+
+    await fetch(`http://localhost/api.php?endpoint=usuarios&id=${id}`, {
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
       method: 'DELETE',
     });
 
@@ -82,6 +125,7 @@ function Usuarios() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+<<<<<<< HEAD
   const usuariosFiltrados = usuarios.filter(u =>
     u.nombre?.toLowerCase().includes(filtro.toLowerCase()) ||
     u.correo?.toLowerCase().includes(filtro.toLowerCase()) ||
@@ -110,6 +154,17 @@ function Usuarios() {
       </button>
 
       <form onSubmit={handleSubmit} className="form">
+=======
+  return (
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Gestión de Usuarios 👥</h1>
+
+      <button onClick={goBackToDashboard} className="back-button" style={{ alignSelf: 'flex-start' }}>
+        ←
+      </button>
+
+      <form onSubmit={handleSubmit} className="form" style={{ justifyContent: 'flex-start' }}>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         <input
           value={form.nombre}
           onChange={(e) => setForm({ ...form, nombre: e.target.value })}
@@ -117,6 +172,7 @@ function Usuarios() {
           required
         />
         <input
+<<<<<<< HEAD
           value={form.correo}
           onChange={(e) => setForm({ ...form, correo: e.target.value })}
           placeholder="Correo"
@@ -124,11 +180,17 @@ function Usuarios() {
           required
         />
         <input
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
           placeholder="Contraseña"
           type="password"
+<<<<<<< HEAD
           required={!form.id}
+=======
+          required
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         />
         <select
           value={form.rol}
@@ -140,6 +202,7 @@ function Usuarios() {
           <option value="tecnico">Técnico</option>
           <option value="operativo">Operativo</option>
         </select>
+<<<<<<< HEAD
         <select
           value={form.estado}
           onChange={(e) => setForm({ ...form, estado: e.target.value })}
@@ -219,6 +282,44 @@ function Usuarios() {
       {showScrollTop && (
         <button onClick={scrollToTop} className="scroll-top-button">
           <FaArrowUp />
+=======
+        <button type="submit" className="add-button">
+          {form.id ? 'Actualizar' : 'Agregar'} Usuario
+        </button>
+      </form>
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usuarios.length === 0 ? (
+            <tr>
+              <td colSpan="3">No hay usuarios registrados.</td>
+            </tr>
+          ) : (
+            usuarios.map((u) => (
+              <tr key={u.id}>
+                <td>{u.nombre}</td>
+                <td>{u.rol}</td>
+                <td>
+                  <button className="btn-action btn-edit" onClick={() => handleEdit(u)}>Editar</button>
+                  <button className="btn-action btn-delete" onClick={() => handleDelete(u.id)}>Eliminar</button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      {showScrollTop && (
+        <button onClick={scrollToTop} className="scroll-top-button">
+          ⬆️
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
         </button>
       )}
     </div>

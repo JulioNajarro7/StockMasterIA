@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { FaArrowUp, FaArrowLeft, FaEdit, FaTrash, FaCheck } from 'react-icons/fa';
+=======
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
 
 function Almacenes() {
   const navigate = useNavigate();
   const [almacenes, setAlmacenes] = useState([]);
+<<<<<<< HEAD
   const [form, setForm] = useState({ id: null, nombre: '', ubicacion: '', capacidad: '' });
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [filtro, setFiltro] = useState('');
@@ -53,6 +57,27 @@ function Almacenes() {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+=======
+  const [form, setForm] = useState({ nombre: '', ubicacion: '', capacidad: '' });
+
+  useEffect(() => {
+    fetch('http://localhost/api.php?endpoint=almacenes')
+      .then(res => res.json())
+      .then(data => setAlmacenes(data));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await fetch('http://localhost/api.php?endpoint=almacenes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
+    setForm({ nombre: '', ubicacion: '', capacidad: '' });
+    fetch('http://localhost/api.php?endpoint=almacenes')
+      .then(res => res.json())
+      .then(data => setAlmacenes(data));
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
   };
 
   const goBackToDashboard = () => {
@@ -63,6 +88,7 @@ function Almacenes() {
     else navigate('/');
   };
 
+<<<<<<< HEAD
   const almacenesFiltrados = almacenes.filter(a =>
     a.nombre?.toLowerCase().includes(filtro.toLowerCase()) ||
     a.ubicacion?.toLowerCase().includes(filtro.toLowerCase())
@@ -100,10 +126,32 @@ function Almacenes() {
           value={form.ubicacion}
           onChange={e => setForm({ ...form, ubicacion: e.target.value })}
           placeholder="Ubicación"
+=======
+  return (
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Gestión de Almacenes 🏢</h1>
+
+      <button onClick={goBackToDashboard} className="back-button" style={{ alignSelf: 'flex-start' }}>←</button>
+
+      <form onSubmit={handleSubmit} className="form">
+        <input
+          type="text"
+          placeholder="Nombre del almacén"
+          value={form.nombre}
+          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Ubicación"
+          value={form.ubicacion}
+          onChange={(e) => setForm({ ...form, ubicacion: e.target.value })}
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
           required
         />
         <input
           type="number"
+<<<<<<< HEAD
           value={form.capacidad}
           onChange={e => setForm({ ...form, capacidad: e.target.value })}
           placeholder="Capacidad"
@@ -180,6 +228,23 @@ function Almacenes() {
           <FaArrowUp />
         </button>
       )}
+=======
+          placeholder="Capacidad"
+          value={form.capacidad}
+          onChange={(e) => setForm({ ...form, capacidad: e.target.value })}
+          required
+        />
+        <button type="submit" className="add-button">Agregar Almacén</button>
+      </form>
+
+      <ul className="list">
+        {almacenes.map((a) => (
+          <li key={a.id}>
+            <strong>{a.nombre}</strong> - {a.ubicacion} (Capacidad: {a.capacidad})
+          </li>
+        ))}
+      </ul>
+>>>>>>> b8fc8abe4d0cadda77f6efc679acffec5103da92
     </div>
   );
 }
