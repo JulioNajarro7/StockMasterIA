@@ -2,6 +2,39 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// --- FUNCIÓN DE VOZ: SOLO SABINA, fallback a cualquier español ---
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  let voices = window.speechSynthesis.getVoices();
+  if (!voices.length) {
+    window.speechSynthesis.onvoiceschanged = () => speak(text);
+    return;
+  }
+
+  let sabinaVoice = voices.find(
+    v => v.name.toLowerCase().includes('sabina') && v.lang.startsWith('es')
+  );
+  if (!sabinaVoice) {
+    sabinaVoice = voices.find(v => v.lang.startsWith('es'));
+  }
+  if (!sabinaVoice) {
+    sabinaVoice = voices[0];
+  }
+
+  const utter = new window.SpeechSynthesisUtterance(text);
+  utter.lang = sabinaVoice?.lang || 'es-ES';
+  utter.voice = sabinaVoice;
+  utter.rate = 1;
+  window.speechSynthesis.speak(utter);
+}
+
+// --- FUNCIÓN PARA DETENER LA VOZ ---
+function stopVoice() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
 function isValidJson(str) {
   try {
     const json = JSON.parse(str);
@@ -11,22 +44,53 @@ function isValidJson(str) {
   }
 }
 
+// --- LIMPIADOR DE RESPUESTA (borra ###, Nota:, etc.) ---
+function cleanResponse(text) {
+  if (typeof text !== 'string') return text;
+  // Quita líneas que comiencen con ###
+  let clean = text
+    .split('\n')
+    .filter(
+      line =>
+        !line.trim().startsWith('###') &&
+        !/^nota:/i.test(line.trim()) &&
+        !/^este no es/i.test(line.trim()) &&
+        !/^no es una acción/i.test(line.trim()) &&
+        !/^responde en texto/i.test(line.trim())
+    )
+    .join('\n')
+    .trim();
+  // Borra espacios extra
+  return clean;
+}
+
 function AiComandos() {
   const navigate = useNavigate();
   const [pregunta, setPregunta] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [chat, setChat] = useState([
-    {
-      role: 'system',
-      content: '¡Hola! Soy tu asistente IA. Puedes hacer preguntas generales o pedir acciones sobre las bases de datos (consultar, insertar, actualizar, eliminar).'
-    }
-  ]);
+  const bienvenida = {
+    role: 'system',
+    content: '¡Hola! Soy tu asistente IA. Puedes hacer preguntas generales o pedir acciones sobre las bases de datos (consultar, insertar, actualizar, eliminar).'
+  };
+  const [chat, setChat] = useState([bienvenida]);
   const chatRef = useRef(null);
 
   const API = 'https://master.soporteumg.com/api.php';
 
   useEffect(() => {
-    // Scroll al final del chat al agregar mensajes
+    if (chat.length < 2) return;
+    const lastMsg = chat[chat.length - 1];
+    if (
+      lastMsg.role === 'assistant' &&
+      typeof lastMsg.content === 'string' &&
+      !isValidJson(lastMsg.content) &&
+      !/<pre|<div/i.test(lastMsg.content)
+    ) {
+      speak(cleanResponse(lastMsg.content));
+    }
+  }, [chat]);
+
+  useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
@@ -46,17 +110,19 @@ function AiComandos() {
       const res = await axios.post(
         'https://openrouter.ai/api/v1/chat/completions',
         {
-          model: 'meta-llama/llama-4-maverick:free',
+          model: 'deepseek/deepseek-prover-v2:free',
           messages: [
             {
               role: 'system',
               content:
-                'Responde en texto natural SI NO es una acción sobre datos. Si detectas una acción de datos (insertar, actualizar, eliminar, consultar), responde SOLO en formato JSON como estos ejemplos:\n' +
+                'IMPORTANTE: Si la pregunta es general, de cultura, conocimiento, ayuda, o de cualquier ámbito fuera de base de datos, responde SIEMPRE en español, en texto natural y amigable, sin ningún formato especial.\n' +
+                'SOLO si la pregunta implica una acción sobre datos de la base de datos (insertar, actualizar, eliminar, consultar), responde SOLO en formato JSON como estos ejemplos:\n' +
                 '{"accion":"consultar","tabla":"productos"}\n' +
                 '{"accion":"consultar","tabla":"productos","filtro":{"stock":"<=10"}}\n' +
                 '{"accion":"insertar","tabla":"productos","datos":{"nombre":"Mouse","categoria":"Tecnología","stock":50,"precio":15.5}}\n' +
                 '{"accion":"actualizar","tabla":"almacenes","id":2,"datos":{"nombre":"Principal","capacidad":500}}\n' +
-                '{"accion":"eliminar","tabla":"salidas","id":4}'
+                '{"accion":"eliminar","tabla":"salidas","id":4}\n' +
+                'NO uses formato JSON si la pregunta no es sobre base de datos. Si la pregunta es general (por ejemplo, comienza con "Cuál", "Cuándo", "Por qué", "Dónde", "Cómo", etc.), responde solo con texto natural, completo y claro.'
             },
             ...chat.filter(m => m.role !== 'system').map(m => ({
               role: m.role,
@@ -79,11 +145,8 @@ function AiComandos() {
       let rawContent = res.data.choices[0].message.content;
       let handled = false;
 
-      // Si es JSON válido (acción sobre la base de datos)
       if (isValidJson(rawContent)) {
         const instrucciones = JSON.parse(rawContent);
-        
-
         const { accion, tabla, id, datos } = instrucciones;
         const tablasProhibidas = ['usuarios'];
 
@@ -114,37 +177,36 @@ function AiComandos() {
               handled = true;
               break;
 
-            case 'actualizar':
-              {
-                const resExistente = await fetch(`${API}?endpoint=${tabla}`);
-                const lista = await resExistente.json();
-                const existente = lista.find(item => item.id == id);
-                if (!existente) {
-                  setChat(prev => [
-                    ...prev,
-                    {
-                      role: 'assistant',
-                      content: `❌ No se encontró el registro con ID ${id} en "${tabla}".`
-                    }
-                  ]);
-                  handled = true;
-                  break;
-                }
-                const datosCompletos = { ...existente, ...datos };
-                await fetch(`${API}?endpoint=${tabla}&id=${id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(datosCompletos)
-                });
+            case 'actualizar': {
+              const resExistente = await fetch(`${API}?endpoint=${tabla}`);
+              const lista = await resExistente.json();
+              const existente = lista.find(item => item.id == id);
+              if (!existente) {
                 setChat(prev => [
                   ...prev,
                   {
                     role: 'assistant',
-                    content: `✅ Registro actualizado en "${tabla}" con ID ${id}.`
+                    content: `❌ No se encontró el registro con ID ${id} en "${tabla}".`
                   }
                 ]);
                 handled = true;
+                break;
               }
+              const datosCompletos = { ...existente, ...datos };
+              await fetch(`${API}?endpoint=${tabla}&id=${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosCompletos)
+              });
+              setChat(prev => [
+                ...prev,
+                {
+                  role: 'assistant',
+                  content: `✅ Registro actualizado en "${tabla}" con ID ${id}.`
+                }
+              ]);
+              handled = true;
+            }
               break;
 
             case 'eliminar':
@@ -165,7 +227,6 @@ function AiComandos() {
               let url = `${API}?endpoint=${tabla}`;
               let dataTabla = await fetch(url).then(r => r.json());
 
-              // Procesar filtros sencillos (igual que antes)
               if (instrucciones.filtro && typeof instrucciones.filtro === 'object') {
                 Object.entries(instrucciones.filtro).forEach(([key, value]) => {
                   if (typeof value === 'string' && value.startsWith('<=')) {
@@ -180,7 +241,6 @@ function AiComandos() {
                 });
               }
 
-              // Muestra máximo 10 resultados si hay muchos
               const dataPreview = dataTabla.length > 10
                 ? [...dataTabla.slice(0, 10), { "...": `Mostrando 10 de ${dataTabla.length} resultados` }]
                 : dataTabla;
@@ -192,7 +252,7 @@ function AiComandos() {
                   content: (
                     <div>
                       <div>✅ Consulta realizada en <strong>{tabla}</strong>:</div>
-                      <pre style={{margin: 0, maxHeight: 300, overflow: 'auto'}}>{JSON.stringify(dataPreview, null, 2)}</pre>
+                      <pre style={{ margin: 0, maxHeight: 300, overflow: 'auto' }}>{JSON.stringify(dataPreview, null, 2)}</pre>
                     </div>
                   )
                 }
@@ -214,10 +274,9 @@ function AiComandos() {
       }
 
       if (!handled) {
-        // Respuesta normal (pregunta general o de otro ámbito)
         setChat(prev => [
           ...prev,
-          { role: 'assistant', content: rawContent }
+          { role: 'assistant', content: cleanResponse(rawContent) }
         ]);
       }
     } catch (error) {
@@ -237,6 +296,27 @@ function AiComandos() {
     else if (role === 'tecnico') navigate('/tecnico');
     else if (role === 'operativo') navigate('/operativo');
     else navigate('/');
+  };
+
+  const limpiarChat = () => {
+    stopVoice();
+    setChat([bienvenida]);
+  };
+
+  const copiarChat = () => {
+    const plainChat = chat
+      .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+      .map(msg =>
+        (msg.role === 'user' ? 'Tú: ' : 'IA: ') +
+        (typeof msg.content === 'string'
+          ? cleanResponse(msg.content)
+          : (msg.content?.props ? '[Respuesta especial]' : String(msg.content))
+        )
+      )
+      .join('\n\n');
+    navigator.clipboard.writeText(plainChat)
+      .then(() => alert('¡Chat copiado al portapapeles!'))
+      .catch(() => alert('No se pudo copiar el chat.'));
   };
 
   return (
@@ -262,8 +342,9 @@ function AiComandos() {
           width: '100%',
           maxWidth: 700,
           display: 'flex',
-          gap: '1rem',
-          marginBottom: '1.5rem'
+          gap: '0.4rem',
+          marginBottom: '1.5rem',
+          flexWrap: 'wrap'
         }}
         autoComplete="off"
       >
@@ -288,11 +369,70 @@ function AiComandos() {
           className="add-button"
           disabled={cargando || !pregunta.trim()}
           style={{
-            minWidth: 120,
-            fontSize: '1.05rem'
+            minWidth: 110,
+            fontSize: '1.05rem',
+            padding: '0.7rem 1.3rem'
           }}
         >
           {cargando ? 'Enviando...' : 'Enviar'}
+        </button>
+        <button
+          type="button"
+          onClick={stopVoice}
+          style={{
+            padding: '0.3rem 0.7rem',
+            background: '#e65379',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.7rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            fontSize: '0.89rem',
+            boxShadow: '0 1px 6px rgba(230,83,121,0.14)',
+            height: 'fit-content',
+            alignSelf: 'center'
+          }}
+          title="Detener voz"
+        >
+          <span style={{fontSize: '1.08em'}}>🔇</span>
+        </button>
+        <button
+          type="button"
+          onClick={limpiarChat}
+          style={{
+            padding: '0.3rem 0.7rem',
+            background: '#888',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.7rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            fontSize: '0.89rem',
+            height: 'fit-content',
+            alignSelf: 'center'
+          }}
+          title="Limpiar chat"
+        >
+          <span style={{fontSize: '1.1em'}}>🧹</span>
+        </button>
+        <button
+          type="button"
+          onClick={copiarChat}
+          style={{
+            padding: '0.3rem 0.7rem',
+            background: '#0074d9',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.7rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            fontSize: '0.89rem',
+            height: 'fit-content',
+            alignSelf: 'center'
+          }}
+          title="Copiar chat"
+        >
+          <span style={{fontSize: '1.1em'}}>📋</span>
         </button>
       </form>
 
@@ -329,7 +469,9 @@ function AiComandos() {
               boxShadow: msg.role === 'user' ? '0 0 6px rgba(102,126,234,0.15)' : '0 0 6px rgba(0,0,0,0.04)'
             }}
           >
-            {msg.content}
+            {msg.role === 'assistant' && typeof msg.content === 'string'
+              ? cleanResponse(msg.content)
+              : msg.content}
           </div>
         ))}
       </div>
