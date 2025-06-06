@@ -1,0 +1,205 @@
+.reporteRoot {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 2rem 1rem;
+}
+
+/* Contenido centrado */
+.reporteContent {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.backButton {
+  align-self: flex-start;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+.backButton:hover {
+  background-color: #43a047;
+}
+
+.centerRow {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.centerInput {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 1.2rem;
+}
+
+.addButton {
+  background-color: #c4b5fd;
+  color: #1f2937;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+.addButton:hover {
+  background-color: #a78bfa;
+}
+
+/* RESPONSIVE: scroll horizontal y centrado SOLO para tabla */
+.reporteScrollContainer {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Scroll horizontal en móvil */
+  overflow-x: auto;
+  justify-content: center;
+}
+
+/* La tabla siempre centrada y usa scroll en móvil si es necesario */
+.reporteTable {
+  width: 100%;
+  max-width: 900px;
+  border-collapse: collapse;
+  margin: 0 auto;
+  color: #222;
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Celda y cabecera */
+.reporteTable th,
+.reporteTable td {
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  color: #222;
+}
+
+.reporteTable th {
+  background-color: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+.reporteTable tr:last-child td {
+  border-bottom: none;
+}
+
+.reporteTable tbody tr:hover {
+  background-color: #f0f4ff;
+}
+
+.emptyMessage {
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.scrollTopButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease;
+}
+.scrollTopButton:hover {
+  background-color: #5a67d8;
+}
+
+/* ------------------- RESPONSIVE ------------------- */
+@media (max-width: 600px) {
+  .reporteContent {
+    max-width: 100vw;
+    padding: 0;
+  }
+
+  .reporteScrollContainer {
+    padding: 0.5rem;
+    border-radius: 0.8rem;
+    box-shadow: none;
+    max-width: 100vw;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+
+  .reporteTable {
+    font-size: 0.93rem;
+    min-width: 480px;
+    width: max-content;
+    margin: 0 auto;
+  }
+
+  .reporteTable th,
+  .reporteTable td {
+    padding: 0.6rem;
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .reporteTable {
+    min-width: 320px;
+    font-size: 0.86rem;
+  }
+
+  .reporteTable th,
+  .reporteTable td {
+    padding: 0.4rem;
+    font-size: 0.90rem;
+  }
+}

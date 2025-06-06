@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import fondo from '../assets/fondo1.gif';
 import LogoMSX from '../assets/LogoMSX.svg';
 
@@ -12,18 +13,32 @@ function CrearUsuario() {
   });
   const [mensaje, setMensaje] = useState('');
   const [loading, setLoading] = useState(false);
+=======
+
+function CrearUsuario() {
+  const [form, setForm] = useState({ nombre: '', correo: '', password: '' });
+  const [mensaje, setMensaje] = useState('');
+>>>>>>> 34122937b37a93ffac8b2283d8c2b6a9769b8c9f
   const navigate = useNavigate();
 
   const API = 'https://master.soporteumg.com/api.php?endpoint=usuarios';
 
+<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje('');
     setLoading(true);
+=======
+  const generarCodigo = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+>>>>>>> 34122937b37a93ffac8b2283d8c2b6a9769b8c9f
 
     try {
       const check = await fetch(API);
       const usuarios = await check.json();
+<<<<<<< HEAD
       const existeUsuario = usuarios.find(u => u.usuario === form.usuario);
       const existeEmail = usuarios.find(u => u.email === form.email);
 
@@ -43,6 +58,25 @@ function CrearUsuario() {
       };
 
       // Registrar usuario en BD
+=======
+      const existeNombre = usuarios.find(u => u.nombre === form.nombre);
+      const existeCorreo = usuarios.find(u => u.correo === form.correo);
+
+      if (existeNombre || existeCorreo) {
+        setMensaje('❌ El nombre o correo ya están registrados.');
+        return;
+      }
+
+      const codigo = generarCodigo();
+
+      const nuevoUsuario = {
+        ...form,
+        rol: 'operativo',
+        estado: 'desactivado',
+        codigo_activacion: codigo
+      };
+
+>>>>>>> 34122937b37a93ffac8b2283d8c2b6a9769b8c9f
       const res = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,6 +84,7 @@ function CrearUsuario() {
       });
 
       if (res.ok) {
+<<<<<<< HEAD
         // Enviar correo de activación
         await fetch('https://master.soporteumg.com/enviar_activacion.php', {
           method: 'POST',
@@ -62,17 +97,32 @@ function CrearUsuario() {
         });
 
         navigate('/activar', { state: { email: form.email, usuario: form.usuario } });
+=======
+        await fetch('https://master.soporteumg.com/enviar_activacion.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo: form.correo, nombre: form.nombre, codigo })
+        });
+
+        navigate('/activar', { state: { correo: form.correo } });
+>>>>>>> 34122937b37a93ffac8b2283d8c2b6a9769b8c9f
       } else {
         setMensaje('❌ Error al crear usuario.');
       }
     } catch (error) {
+<<<<<<< HEAD
       setMensaje('❌ Error al conectar con el servidor.');
     } finally {
       setLoading(false);
+=======
+      console.error(error);
+      setMensaje('❌ Error al conectar con el servidor.');
+>>>>>>> 34122937b37a93ffac8b2283d8c2b6a9769b8c9f
     }
   };
 
   return (
+<<<<<<< HEAD
     <div
       className="login-bg d-flex align-items-center justify-content-center vh-100"
       style={{
@@ -204,6 +254,49 @@ function CrearUsuario() {
           </div>
         )}
         <p style={{ marginTop: '1.2rem', textAlign: 'center', fontSize: '0.9rem' }}>
+=======
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">Crear nuevo usuario</h2>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="text"
+            placeholder="Nombre de usuario"
+            value={form.nombre}
+            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={form.correo}
+            onChange={(e) => setForm({ ...form, correo: e.target.value })}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+          <button type="submit">Registrar Usuario</button>
+        </form>
+
+        {mensaje && (
+          <p style={{
+            marginTop: '1.5rem',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            color: mensaje.includes('✅') ? '#38a169' : '#e53e3e'
+          }}>
+            {mensaje}
+          </p>
+        )}
+
+        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
+>>>>>>> 34122937b37a93ffac8b2283d8c2b6a9769b8c9f
           <a href="/" style={{ color: '#4f46e5', textDecoration: 'underline' }}>
             Volver al inicio de sesión
           </a>
