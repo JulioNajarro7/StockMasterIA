@@ -1,0 +1,356 @@
+/* ===== Reseteo General ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: auto;
+  min-height: 100%;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('./assets/fondo1.gif') center center/cover no-repeat fixed;
+}
+
+/* ===== Login Styles ===== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.login-card {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.login-logo {
+  width: 100px;
+  margin-bottom: 1.5rem;
+}
+
+.login-title {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-form input {
+  padding: 1rem;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.7rem;
+}
+
+.login-form button {
+  padding: 1rem;
+  font-size: 1.2rem;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #5a67d8;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #555;
+}
+
+/* ===== Dashboard Styles ===== */
+.dashboard-container {
+  padding: 2rem;
+  background: #f5f5f5;
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.dashboard-header {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  margin-top: 2rem;
+  color: #333;
+}
+
+.logout-button {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #c53030;
+}
+
+/* ===== Grid de Tarjetas ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 1400px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.dashboard-card h2 {
+  margin-bottom: 1rem;
+  color: #4f46e5;
+}
+
+.dashboard-card p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.dashboard-card button {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-card button:hover {
+  background-color: #5a67d8;
+}
+
+/* ===== Botones de Acción ===== */
+.add-button {
+  background-color: #c4b5fd;
+  color: #1f2937;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  transition: background-color 0.3s ease;
+}
+
+.add-button:hover {
+  background-color: #a78bfa;
+}
+
+.back-button {
+  margin-top: 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #43a047;
+}
+
+/* ===== Listas y Formularios ===== */
+.list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.list li {
+  background: #e2e8f0;
+  margin-bottom: 0.5rem;
+  padding: 0.8rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: left;
+  color: #333;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 2rem;
+}
+
+.form input,
+.form select {
+  flex: 1 1 180px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+
+/* ===== Tabla de Datos ===== */
+.table {
+  width: max-content;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.table th {
+  background-color: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: #f0f4ff;
+}
+
+/* ===== Botones de acción en tabla ===== */
+.btn-edit {
+  background-color: #f6ad55;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #dd6b20;
+}
+
+.btn-delete {
+  background-color: #f56565;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c53030;
+}
+
+.empty-message {
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* ===== Scroll Top Button ===== */
+.scroll-top-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease;
+}
+
+.scroll-top-button:hover {
+  background-color: #5a67d8;
+}
+
+/* ==== MÓDULO REPORTES: tabla centrada y letras negras ==== */
+.reporte-scroll-container {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.reporte-table {
+  width: max-content;
+  margin: 0 auto;
+  border-collapse: collapse;
+  color: #222;
+}
+
+.reporte-table th,
+.reporte-table td {
+  padding: 0.8rem 1.2rem;
+  text-align: left;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  color: #222;
+}
+
+.reporte-table tr {
+  border-bottom: 1px solid #eee;
+}
+input::placeholder {
+  color: #eee !important;
+  opacity: 1;
+}
+.reporte-table thead {
+  background-color: #667eea;
+  color: white;
+}
